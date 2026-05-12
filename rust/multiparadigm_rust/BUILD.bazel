@@ -1,0 +1,35 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@crates//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_shared_library", "rust_test")
+
+exports_files(["Cargo.toml"])
+
+rust_test(
+    name = "solvers_unit_test",
+    srcs = ["src/solvers.rs"],
+    crate_root = "src/solvers.rs",
+    edition = "2021",
+    visibility = ["//visibility:public"],
+)
+
+rust_shared_library(
+    name = "multiparadigm_rust_native",
+    srcs = [
+        "src/lib.rs",
+        "src/solvers.rs",
+    ],
+    aliases = aliases(),
+    crate_features = ["extension-module"],
+    crate_root = "src/lib.rs",
+    edition = "2021",
+    deps = all_crate_deps(),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+    visibility = ["//visibility:private"],
+)
+
+copy_file(
+    name = "multiparadigm_rust_so",
+    src = ":multiparadigm_rust_native",
+    out = "multiparadigm_rust.so",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,34 @@
+common --enable_bzlmod
+
+# nanobind_bazel `nb_sizeopts()` requires either MSVC/non-MSVC + minsize or minsize off.
+# When the C++ toolchain is not classified as clang/gcc, turn minsize off so
+# `without_sizeopts` matches.
+build --@nanobind_bazel//:minsize=false
+
+build --cxxopt=-std=c++23
+build --host_cxxopt=-std=c++23
+build --copt=-O3
+# C++ modules: enable on the extension target via `features = ["cpp_modules"]` when
+# compatible with nanobind_bazel's configurable `copts` (see cpp/BUILD.bazel).
+
+# Pin Clang 22 (not the distro default /usr/bin/clang, which may be another major).
+# Adjust paths if your install differs (e.g. only /usr/bin/clang-22 from RPM).
+build --action_env=CC=/usr/local/bin/clang-22
+build --action_env=CXX=/usr/local/bin/clang-22
+build --repo_env=CC=/usr/local/bin/clang-22
+build --repo_env=CXX=/usr/local/bin/clang-22
+
+# PyO3 build scripts may see a newer host Python than supported; allow stable ABI.
+build --action_env=PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
+build --repo_env=PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
+
+# Helpful defaults for Python extensions on Linux.
+build --enable_platform_specific_config
+
+# AddressSanitizer + UndefinedBehaviorSanitizer for pure C++ `cc_test` targets.
+#   bazel test --config=asan //cpp:solvers_test
+test:asan --cxxopt=-fsanitize=address,undefined
+test:asan --linkopt=-fsanitize=address,undefined
+test:asan --copt=-O1
+test:asan --test_env=ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:check_initialization_order=1:strict_init_order=1
+test:asan --test_env=UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1

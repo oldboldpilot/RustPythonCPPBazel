@@ -1,0 +1,8 @@
+filegroup(
+    name = "prolog_sources",
+    srcs = [
+        "sudoku.pl",
+        "maze.pl",
+    ],
+    visibility = ["//visibility:public"],
+)

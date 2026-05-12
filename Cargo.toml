@@ -1,0 +1,3 @@
+[workspace]
+members = ["rust/multiparadigm_rust"]
+resolver = "2"

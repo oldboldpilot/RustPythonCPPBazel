@@ -1,0 +1,109 @@
+load("@bazel_skylib//rules:select_file.bzl", "select_file")
+load("@nanobind_bazel//:build_defs.bzl", "nanobind_extension")
+load("@rules_cc//cc:cc_import.bzl", "cc_import")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+load(
+    "//cpp:cppm.bzl",
+    "cppm_interface",
+    "cppm_pcm_cc_dep",
+    "cppm_select_outputs",
+    "libcxx_std_module",
+)
+
+# libc++ ``std`` BMI for ``import std;`` (Clang 22 + ``-stdlib=libc++``).
+libcxx_std_module(name = "libcxx_std")
+
+select_file(
+    name = "libcxx_std_pcm",
+    srcs = ":libcxx_std",
+    subpath = "std.pcm",
+)
+
+select_file(
+    name = "libcxx_std_obj",
+    srcs = ":libcxx_std",
+    subpath = "std.o",
+)
+
+cppm_pcm_cc_dep(
+    name = "libcxx_std_pcm_dep",
+    pcm = ":libcxx_std_pcm",
+)
+
+cc_import(
+    name = "libcxx_std_import",
+    pic_objects = [":libcxx_std_obj"],
+)
+
+# Example: ``.cppm`` with ``import std;`` → LLVM BMI + object via ``cppm_interface``.
+cppm_interface(
+    name = "cppm_demo_mod",
+    src = "demo.cppm",
+    module_name = "demo.math",
+    std_pcm = ":libcxx_std_pcm_dep",
+)
+
+cppm_select_outputs(
+    name = "cppm_demo_out",
+    cppm = ":cppm_demo_mod",
+    stem = "cppm_demo_mod",
+)
+
+cc_import(
+    name = "cppm_demo_mod_import",
+    pic_objects = [":cppm_demo_out_obj"],
+)
+
+cppm_pcm_cc_dep(
+    name = "cppm_demo_pcm_dep",
+    pcm = ":cppm_demo_out_pcm",
+)
+
+cc_test(
+    name = "cppm_demo_test",
+    srcs = ["cppm_use_demo_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-stdlib=libc++",
+        "-fmodule-file=std=$(execpath :libcxx_std_pcm_dep)",
+        "-fmodule-file=demo.math=$(execpath :cppm_demo_pcm_dep)",
+    ],
+    linkopts = ["-stdlib=libc++"],
+    deps = [
+        ":cppm_demo_pcm_dep",
+        ":libcxx_std_pcm_dep",
+        ":cppm_demo_mod_import",
+        ":libcxx_std_import",
+    ],
+)
+
+cc_library(
+    name = "solvers_module_iface",
+    srcs = ["solvers_module_iface.cpp"],
+    copts = ["-std=c++23"],
+    features = ["cpp_modules"],
+    visibility = ["//visibility:public"],
+)
+
+nanobind_extension(
+    name = "multiparadigm_cpp",
+    srcs = [
+        "bindings.cpp",
+        "solvers.hpp",
+    ],
+    copts = ["-std=c++23"],
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "solvers_test",
+    srcs = [
+        "solvers_test.cpp",
+        "solvers.hpp",
+        "mp_test.hpp",
+    ],
+    copts = ["-std=c++23"],
+    visibility = ["//visibility:public"],
+)

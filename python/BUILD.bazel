@@ -1,0 +1,44 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@rules_python//python:py_binary.bzl", "py_binary")
+load("@rules_python//python:py_library.bzl", "py_library")
+load("@rules_python//python:py_test.bzl", "py_test")
+
+copy_file(
+    name = "multiparadigm_cpp_so",
+    src = "//cpp:multiparadigm_cpp",
+    out = "multiparadigm_cpp.so",
+)
+
+copy_file(
+    name = "multiparadigm_rust_so",
+    src = "//rust/multiparadigm_rust:multiparadigm_rust_so",
+    out = "multiparadigm_rust.so",
+)
+
+py_library(
+    name = "multiparadigm",
+    srcs = glob(["multiparadigm/**/*.py"]),
+    data = [
+        ":multiparadigm_cpp_so",
+        ":multiparadigm_rust_so",
+        "//prolog:prolog_sources",
+    ],
+    imports = ["."],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "demo",
+    srcs = ["demo.py"],
+    main = "demo.py",
+    deps = [":multiparadigm"],
+)
+
+py_test(
+    name = "multiparadigm_py_test",
+    srcs = ["tests/test_multiparadigm.py"],
+    main = "tests/test_multiparadigm.py",
+    deps = [":multiparadigm"],
+    imports = ["."],
+    size = "medium",
+)

@@ -1,0 +1,40 @@
+"""Multiparadigm solvers: C++23 modules + nanobind, SWI-Prolog, Rust PyO3."""
+
+module(
+    name = "multiparadigm",
+    version = "0.1.0",
+)
+
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_python", version = "1.0.0")
+bazel_dep(name = "nanobind_bazel", version = "2.12.0")
+bazel_dep(name = "rules_rust", version = "0.54.1")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.12",
+)
+use_repo(python, "python_3_12", "python_versions")
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2021",
+    versions = ["1.84.1"],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
+
+crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//:Cargo.lock",
+    manifests = [
+        "//:Cargo.toml",
+        "//rust/multiparadigm_rust:Cargo.toml",
+    ],
+)
+use_repo(crate, "crates")

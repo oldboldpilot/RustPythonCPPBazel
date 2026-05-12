@@ -1,0 +1,14 @@
+exports_files([
+    "Cargo.lock",
+    "Cargo.toml",
+])
+
+test_suite(
+    name = "all_tests",
+    tests = [
+        "//cpp:solvers_test",
+        "//python:multiparadigm_py_test",
+        "//rust/multiparadigm_rust:solvers_unit_test",
+    ],
+    visibility = ["//visibility:public"],
+)
