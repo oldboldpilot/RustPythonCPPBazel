@@ -2,10 +2,9 @@
 
 Multiparadigm workspace: **Bazel**, **C++23** (nanobind extension), **Rust** (PyO3), **Python**, and **SWI-Prolog** solvers (Sudoku + maze).
 
-## Policies and C++ conventions
+## Policies (local only)
 
-- **Commit / push / authorship:** see [`config/update_policy.txt`](config/update_policy.txt).
-- **C++ direction (modules, `import std`, style):** see [`config/cpp_details.txt`](config/cpp_details.txt).
+Optional notes live under `config/` as **`update_policy.txt`** and **`cpp_details.txt`**. Those names are listed in **`config/.gitignore`** and are **not** tracked by Git—keep your own copies locally if you use them.
 
 ## Build and test
 
