@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
-# Push current branch to GitHub (origin), then to Gitea if GITEA_PUSH_URL is set in config/.env.
+# Push current branch to GitHub (origin), then to Gitea if GITEA_PUSH_URL is set in the environment.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
-
-if [[ -f config/.env ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source config/.env
-  set +a
-fi
 
 branch="$(git branch --show-current)"
 if ! git remote get-url origin &>/dev/null; then
@@ -33,5 +26,5 @@ if [[ -n "${GITEA_PUSH_URL:-}" ]]; then
   echo "Pushing to gitea (${branch})…"
   git push gitea "${branch}"
 else
-  echo "Skipping Gitea (set GITEA_PUSH_URL in config/.env to enable)."
+  echo "Skipping Gitea (export GITEA_PUSH_URL to enable)."
 fi
