@@ -20,9 +20,9 @@ NAS sync follows **`config/update_policy.txt`**: ensure the NAS mount is availab
 
 SSH keys or other credentials are read from your environment / `config/.env` as you configure them; the scripts do not print secret values.
 
-## Policies (local only)
+## Policies (local Git, copied to NAS)
 
-Optional notes live under `config/` as **`update_policy.txt`** and **`cpp_details.txt`**. Those names are listed in **`config/.gitignore`** and are **not** tracked by Git—keep your own copies locally if you use them.
+**`config/update_policy.txt`** and **`config/cpp_details.txt`** are gitignored (not on GitHub). Keep them locally; **`scripts/backup_to_nas.sh`** always **rsyncs them to the NAS** under **`config/`** when they exist, so the NAS mirror has your policy and C++ notes.
 
 ## Build and test
 
