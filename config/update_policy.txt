@@ -1,0 +1,102 @@
+# Update Policy for AkoEdeYorubaFunAwonEwe
+
+## Pre-Commit Checklist
+
+ remote repository is both in github and gitea(self-hosted, credentials stored in config/.env file) 
+1. **Build Verification**
+  - Use python linters to check code quality
+  - commit all changes in the local repository to ensure a clean working directory
+  - recursively add all changes to staging area: `git add .`
+  - add the src folder specifically: `git add src/`
+  - add the js folder specifically: `git add js/`
+  - organise and move all markdown files except README and QUICKSTART to docs/ folder for python documentation: `git mv *.md docs/`
+   
+  `
+2. **Test Suite**
+   - All tests must pass before pushing
+   - Command: `ctest --test-dir build`
+   - Review code for adherence to coding standards
+
+3. **Documentation Updates** (Required for every push)
+   - Update ai/CLAUDE.md (technical changes)
+   - Update CLAUDE.md (root quick reference)
+   - Sync .github/copilot-instructions.md with CLAUDE.md
+   - Sync ai/gemini.md with CLAUDE.md
+   - Update docs/INDEX.md (if new/removed docs)
+   - Update docs/PRD.md (status, test counts)
+   - Update docs/ROADMAP.md (progress)
+   - Update README.md (user-facing changes)
+   - Move all markdown except README and QUICKSTART docs to docs/ folder for python bot documentation
+   - Organise the docs/ folder into subfolders by topic:
+     - docs/api/ for API documentation
+     - docs/guides/ for user guides and tutorials
+     - docs/architecture/ for system architecture and design docs
+     - docs/release_notes/ for changelogs and release notes
+     - docs/technical/ for deep technical dives
+     - docs/meeting_notes/ for meeting minutes and notes
+     - docs/other/ for miscellaneous documentation
+     - Organise and update docs/INDEX.md to reflect this new structure
+     - Ensure all links in docs/INDEX.md are valid and up to date
+     - Ensure all links and reference in the documentation point to the correct locations after reorganization
+     - Other general documentation improvements as needed, and following best practices for technical writing
+     - Follow the same process for the root README.md,QUICKSTART and INDEX if it contains sections that fit into these categories
+     - Arrange the root docs into a docs/ folder if applicable in the same way as above for the python bot documentation
+
+4. **Session State**
+   - Save session state to docs/session_logs/
+
+## Authorship Policy (MANDATORY)
+
+**ALL code and commits MUST be attributed ONLY to: Olumuyiwa Oluwasanmi**
+
+### Prohibited Actions
+- NEVER add "Co-Authored-By:" lines with AI agent names (Claude, Copilot, Anthropic, etc.)
+- NEVER use "@author Claude", "@author AI Assistant", or any AI agent attribution
+- NEVER include AI agent names in git history, branch names, file headers, or comments
+- NEVER mention AI assistants as co-authors in commit messages
+
+### Required Actions
+- ALWAYS use "@author Olumuyiwa Oluwasanmi" in file headers
+- VERIFY existing files follow this policy before modifying
+- All commits attributed solely to: Olumuyiwa Oluwasanmi
+
+### Violation Response
+Any violation of this policy must be fixed immediately by amending the commit
+or rebasing the history to remove AI attributions.
+
+## Commit Message Format
+
+Commit messages must be:
+- Detailed and descriptive of the changes made
+- Follow conventional commits format (feat:, fix:, docs:, refactor:, etc.)
+- Include a summary of what changed and why
+- NO AI co-author attributions
+
+Example:
+```
+feat(module): Brief description of feature
+
+Detailed explanation of what changed:
+- Change 1
+- Change 2
+- Change 3
+
+Files modified:
+- file1.cpp
+- file2.cppm
+```
+
+## Post-Commit Actions
+
+1. **Push to GitHub**
+   - Push to appropriate branch
+   - Verify CI/CD passes
+
+2. **Backup to NAS**
+   - Make sure NAS is mounted and accessible
+   - If we are logging in remotely from another machine make sure we have passwordless ssh to oluwasanmi-fedora-server
+   - The nas backup folder is located on oluwasanmi-fedora-server in the folder specified below:
+   - NAS backup folder is:`/home/muyiwa/PrimaryNAS/DataFolder/PycharmProjects/AkoEdeYorubaFunAwonEwe`
+   - Run: `bash scripts/backup_to_nas.sh` (create script if it does not exist)
+   - Verify backup completed successfully
+
